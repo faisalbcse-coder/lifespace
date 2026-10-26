@@ -1,0 +1,907 @@
+@import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Noto+Sans+Bengali:wght@400;500;600;700&family=Noto+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Poppins:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
+
+/* Class-based dark mode (toggled via <html class="dark">) */
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --font-hind: 'Hind Siliguri', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-noto: 'Noto Sans Bengali', 'Noto Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-sans-en: 'Poppins', 'Noto Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-times: var(--font-sans-en);
+}
+
+.font-heading-bn {
+  font-family: var(--font-hind) !important;
+}
+
+.font-menu-bn {
+  font-family: var(--font-hind) !important;
+}
+
+.font-body-bn {
+  font-family: var(--font-noto) !important;
+}
+
+.font-sans-en {
+  font-family: var(--font-sans-en) !important;
+}
+
+.font-times-en {
+  font-family: var(--font-sans-en) !important;
+}
+
+@layer base {
+  :root {
+    color-scheme: light;
+    --background: #f4f7fb;
+    --foreground: #0f172a;
+    --card: #ffffff;
+    --card-foreground: #0f172a;
+    --popover: #ffffff;
+    --popover-foreground: #0f172a;
+    --primary: #0072ff;
+    --primary-foreground: #ffffff;
+    --secondary: #f1f5f9;
+    --secondary-foreground: #1e293b;
+    --muted: #f1f5f9;
+    --muted-foreground: #475569;
+    --accent: #f8fafc;
+    --accent-foreground: #0f172a;
+    --destructive: #ef4444;
+    --destructive-foreground: #ffffff;
+    --border: rgba(226, 232, 240, 0.8);
+    --input: #e2e8f0;
+    --ring: #00c6ff;
+    --radius: 1rem;
+
+    --glass-panel-bg: rgba(255, 255, 255, 0.78);
+    --glass-surface-bg: rgba(255, 255, 255, 0.68);
+    --glass-nav-bg: rgba(255, 255, 255, 0.82);
+    --glass-border: rgba(255, 255, 255, 0.6);
+    --glass-shadow: 0 20px 50px rgba(15, 23, 42, 0.08), inset 0 0 25px rgba(255, 255, 255, 0.4);
+    --grid-dot: rgba(15, 23, 42, 0.03);
+  }
+
+  .dark {
+    color-scheme: dark;
+    --background: #080b18;
+    --foreground: #f8fafc;
+    --card: #0f172a;
+    --card-foreground: #f8fafc;
+    --popover: #0f172a;
+    --popover-foreground: #f8fafc;
+    --primary: #00c6ff;
+    --primary-foreground: #ffffff;
+    --secondary: #1e293b;
+    --secondary-foreground: #f8fafc;
+    --muted: #1e293b;
+    --muted-foreground: #94a3b8;
+    --accent: #1e293b;
+    --accent-foreground: #f8fafc;
+    --destructive: #ef4444;
+    --destructive-foreground: #ffffff;
+    --border: rgba(255, 255, 255, 0.12);
+    --input: rgba(255, 255, 255, 0.1);
+    --ring: #00eaff;
+
+    --glass-panel-bg: rgba(255, 255, 255, 0.08);
+    --glass-surface-bg: rgba(255, 255, 255, 0.05);
+    --glass-nav-bg: rgba(8, 11, 24, 0.78);
+    --glass-border: rgba(255, 255, 255, 0.16);
+    --glass-shadow: 0 30px 80px rgba(0, 0, 0, 0.45), inset 0 0 30px rgba(255, 255, 255, 0.04);
+    --grid-dot: rgba(255, 255, 255, 0.035);
+  }
+}
+
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
+  width: 100%;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  min-height: 100vh;
+  transition: background-color 0.4s ease, color 0.25s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.dark body {
+  background: radial-gradient(circle at 20% 20%, rgba(0, 245, 255, 0.18), transparent 38%), radial-gradient(circle at 80% 80%, rgba(123, 44, 255, 0.22), transparent 38%), #080b18;
+}
+
+body:not(.dark) {
+  background: radial-gradient(circle at 20% 20%, rgba(0, 245, 255, 0.08), transparent 38%), radial-gradient(circle at 80% 80%, rgba(123, 44, 255, 0.1), transparent 38%), #f5f8fc;
+}
+
+/* ───────────── Ambient Morphing Liquid Background Canvas ───────────── */
+.liquid-bg {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.blob {
+  position: absolute;
+  border-radius: 50%;
+  animation: liquidMove 14s infinite ease-in-out;
+  will-change: transform, border-radius;
+}
+
+.blob-1 {
+  width: 480px;
+  height: 480px;
+  background: linear-gradient(135deg, #00f5ff, #0066ff);
+  top: -120px;
+  left: -90px;
+  filter: blur(65px);
+  opacity: 0.24;
+}
+
+.blob-2 {
+  width: 440px;
+  height: 440px;
+  background: linear-gradient(135deg, #ff00cc, #7b2cff);
+  right: -90px;
+  bottom: -100px;
+  animation-delay: -5s;
+  filter: blur(65px);
+  opacity: 0.22;
+}
+
+.blob-3 {
+  width: 320px;
+  height: 320px;
+  background: linear-gradient(135deg, #00ffaa, #00ccff);
+  left: 42%;
+  top: 12%;
+  animation-delay: -9s;
+  filter: blur(55px);
+  opacity: 0.18;
+}
+
+.dark .blob-1 { opacity: 0.32; }
+.dark .blob-2 { opacity: 0.28; }
+.dark .blob-3 { opacity: 0.24; }
+
+@keyframes liquidMove {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+    border-radius: 50%;
+  }
+  25% {
+    transform: translate(90px, 50px) scale(1.15);
+    border-radius: 45% 55% 60% 40%;
+  }
+  50% {
+    transform: translate(-45px, 110px) scale(0.92);
+    border-radius: 60% 40% 45% 55%;
+  }
+  75% {
+    transform: translate(70px, -35px) scale(1.1);
+    border-radius: 35% 65% 55% 45%;
+  }
+}
+
+/* ───────────── Frosted Liquid-Glass Surfaces ───────────── */
+.glass-nav {
+  background: var(--glass-nav-bg);
+  -webkit-backdrop-filter: blur(25px) saturate(160%);
+  backdrop-filter: blur(25px) saturate(160%);
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.glass-surface {
+  background: var(--glass-surface-bg);
+  -webkit-backdrop-filter: blur(25px) saturate(140%);
+  backdrop-filter: blur(25px) saturate(140%);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+.glass-panel {
+  background: var(--glass-panel-bg);
+  -webkit-backdrop-filter: blur(25px) saturate(160%);
+  backdrop-filter: blur(25px) saturate(160%);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+/* ───────────── Liquid Animated Button ───────────── */
+.liquid-btn {
+  position: relative;
+  overflow: hidden;
+  color: #fff;
+  font-weight: 600;
+  background: linear-gradient(90deg, #00c6ff, #0072ff, #8a2be2);
+  box-shadow: 0 10px 30px rgba(0, 114, 255, 0.35);
+  transition: all 0.35s ease;
+}
+
+.liquid-btn::before,
+.liquid-btn::after {
+  content: "";
+  position: absolute;
+  width: 140px;
+  height: 140px;
+  border-radius: 45%;
+  background: rgba(255, 255, 255, 0.22);
+  animation: buttonLiquid 5s infinite linear;
+  pointer-events: none;
+}
+
+.liquid-btn::before {
+  left: -35px;
+  bottom: -90px;
+}
+
+.liquid-btn::after {
+  right: -35px;
+  top: -90px;
+  animation-delay: -2.5s;
+}
+
+.liquid-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 40px rgba(0, 198, 255, 0.45), 0 0 25px rgba(0, 114, 255, 0.6);
+}
+
+.liquid-btn:active {
+  transform: scale(0.98);
+}
+
+@keyframes buttonLiquid {
+  0% { transform: rotate(0) translateX(0); }
+  50% { transform: rotate(180deg) translateX(30px); }
+  100% { transform: rotate(360deg) translateX(0); }
+}
+
+/* ───────────── Panir Moto Liquid Card & Droplets ───────────── */
+.liquid-water-card {
+  background: radial-gradient(130% 130% at 20% 10%, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.06) 55%, rgba(0, 234, 255, 0.1) 100%);
+  -webkit-backdrop-filter: blur(35px) saturate(190%);
+  backdrop-filter: blur(35px) saturate(190%);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  box-shadow: 
+    0 30px 80px -15px rgba(0, 140, 255, 0.35),
+    0 10px 30px -5px rgba(0, 0, 0, 0.25),
+    inset 0 2px 3px rgba(255, 255, 255, 0.85),
+    inset 0 -3px 12px rgba(0, 234, 255, 0.3),
+    inset 0 0 35px rgba(255, 255, 255, 0.08);
+  animation: waterCardFloat 8s infinite ease-in-out;
+}
+
+@keyframes waterCardFloat {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  35% {
+    transform: translateY(-4px) rotate(0.35deg);
+  }
+  70% {
+    transform: translateY(2px) rotate(-0.25deg);
+  }
+}
+
+/* 3D Glass Water Droplet */
+.water-droplet {
+  border-radius: 50%;
+  background: radial-gradient(circle at 32% 28%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.45) 20%, rgba(0, 234, 255, 0.25) 55%, rgba(0, 114, 255, 0.45) 100%);
+  box-shadow: 
+    inset -3px -4px 7px rgba(0, 70, 180, 0.5),
+    inset 2px 2px 5px rgba(255, 255, 255, 0.9),
+    0 12px 25px rgba(0, 150, 255, 0.35),
+    0 2px 6px rgba(0, 0, 0, 0.2);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  pointer-events: none;
+}
+
+/* ───────────── Neumorphic Soft Liquid (Exact Reference Image Style) ───────────── */
+.neumorph-canvas {
+  background-color: #e0e5ec;
+}
+
+.neumorph-card {
+  background: linear-gradient(145deg, #e6ecf4 0%, #e0e5ec 50%, #d8dfe9 100%);
+  border-radius: 9999px;
+  box-shadow: 
+    24px 24px 55px #6d7f99,
+    -24px -24px 55px #ffffff,
+    8px 8px 20px #556782,
+    -8px -8px 20px #ffffff;
+  transition: all 0.4s ease;
+}
+
+@media (max-width: 640px) {
+  .neumorph-card {
+    border-radius: 44px;
+    box-shadow: 
+      16px 16px 36px #6d7f99,
+      -16px -16px 36px #ffffff,
+      6px 6px 14px #556782,
+      -6px -6px 14px #ffffff;
+  }
+}
+
+.neumorph-input {
+  width: 100%;
+  height: 52px;
+  padding: 0 24px;
+  border-radius: 9999px;
+  background-color: #e0e5ec;
+  border: none;
+  outline: none;
+  color: #1e293b;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 
+    inset 6px 6px 12px #6b7d97,
+    inset -6px -6px 12px #ffffff,
+    inset 2px 2px 5px #4f6078,
+    inset -2px -2px 4px #ffffff;
+  transition: all 0.25s ease;
+}
+
+.neumorph-input::placeholder {
+  color: #64748b;
+}
+
+.neumorph-input:focus {
+  box-shadow: 
+    inset 7px 7px 15px #5c6d87,
+    inset -7px -7px 15px #ffffff,
+    inset 3px 3px 6px #43536b,
+    inset -3px -3px 5px #ffffff;
+}
+
+.neumorph-btn {
+  width: 100%;
+  height: 52px;
+  border-radius: 9999px;
+  background: linear-gradient(145deg, #e8edf5 0%, #e0e5ec 60%, #d8dfe9 100%);
+  color: #2563eb;
+  font-weight: 700;
+  font-size: 16px;
+  border: none;
+  outline: none;
+  box-shadow: 
+    8px 8px 18px #6b7d97,
+    -8px -8px 18px #ffffff,
+    3px 3px 7px #52637b,
+    -3px -3px 7px #ffffff;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease, color 0.2s ease;
+  user-select: none;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.neumorph-btn:hover {
+  transform: translateY(-2px);
+  color: #1d4ed8;
+  box-shadow: 
+    11px 11px 24px #5c6d87,
+    -11px -11px 24px #ffffff,
+    4px 4px 10px #43536b,
+    -4px -4px 10px #ffffff;
+}
+
+.neumorph-btn:active {
+  transform: translateY(1px);
+  box-shadow: 
+    inset 6px 6px 13px #596b83,
+    inset -6px -6px 13px #ffffff,
+    inset 2px 2px 5px #43536b,
+    inset -2px -2px 5px #ffffff;
+}
+
+.neumorph-btn.is-sloshing {
+  animation: waterSloshAnimation 0.85s cubic-bezier(0.2, 1.35, 0.35, 1) forwards;
+  box-shadow: 
+    inset 6px 6px 13px #596b83,
+    inset -6px -6px 13px #ffffff,
+    inset 2px 2px 5px #43536b,
+    inset -2px -2px 5px #ffffff;
+}
+
+/* Soft Neumorphic Water Droplet */
+.water-droplet-neumorph {
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #ffffff 0%, #e0e5ec 60%, #cfd7e3 100%);
+  box-shadow: 
+    4px 4px 10px #6b7d97,
+    -4px -4px 10px #ffffff,
+    1.5px 1.5px 4px #52637b,
+    -1.5px -1.5px 4px #ffffff;
+  pointer-events: none;
+}
+
+/* ───────────── Pure Colorless Transparent Glass (Panir Moto / Zero Blue Color) ───────────── */
+.pure-glass-card {
+  background: rgba(255, 255, 255, 0.25);
+  -webkit-backdrop-filter: blur(28px);
+  backdrop-filter: blur(28px);
+  border: 1.5px solid rgba(255, 255, 255, 0.75);
+  box-shadow: 
+    0 20px 50px rgba(0, 0, 0, 0.07),
+    inset 0 2px 3px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -1.5px 3px 0 rgba(255, 255, 255, 0.3);
+  animation: waterCardFloat 8s infinite ease-in-out;
+}
+
+/* Colorless Pure Glass Input */
+.pure-glass-input {
+  width: 100%;
+  height: 50px;
+  padding: 0 16px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.35);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border: 1.5px solid rgba(255, 255, 255, 0.7);
+  color: #0f172a;
+  box-shadow: 
+    inset 0 1.5px 3px rgba(0, 0, 0, 0.04),
+    inset 0 -1px 2px rgba(255, 255, 255, 0.8);
+  transition: all 0.2s ease;
+}
+
+.pure-glass-input:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 0.6);
+  border-color: rgba(255, 255, 255, 1);
+  box-shadow: 
+    0 0 0 3px rgba(15, 23, 42, 0.08),
+    inset 0 1px 2px rgba(255, 255, 255, 0.9);
+}
+
+/* Colorless Pure Glass Liquid Button (Water Glass that Sloshes) */
+.pure-glass-btn {
+  position: relative;
+  overflow: hidden;
+  color: #0f172a;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.55);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  border: 1.5px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 
+    0 8px 24px rgba(0, 0, 0, 0.06),
+    inset 0 2px 3px rgba(255, 255, 255, 1),
+    inset 0 -1.5px 2px rgba(0, 0, 0, 0.04);
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s ease, box-shadow 0.2s ease;
+  user-select: none;
+  cursor: pointer;
+}
+
+.pure-glass-btn:hover {
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.8);
+  border-color: #ffffff;
+  box-shadow: 
+    0 12px 30px rgba(0, 0, 0, 0.09),
+    inset 0 2px 4px #ffffff;
+}
+
+.pure-glass-btn .glass-wave-layer-1,
+.pure-glass-btn .glass-wave-layer-2 {
+  content: "";
+  position: absolute;
+  width: 250px;
+  height: 250px;
+  border-radius: 42%;
+  pointer-events: none;
+}
+
+.pure-glass-btn .glass-wave-layer-1 {
+  left: -40px;
+  bottom: -180px;
+  background: rgba(255, 255, 255, 0.45);
+  animation: waterWaveSpin 4.5s infinite linear;
+}
+
+.pure-glass-btn .glass-wave-layer-2 {
+  right: -40px;
+  bottom: -175px;
+  background: rgba(255, 255, 255, 0.25);
+  animation: waterWaveSpin 6.5s infinite linear reverse;
+}
+
+.pure-glass-btn .glass-reflection-shine {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 48%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.05) 80%, transparent 100%);
+  border-top-left-radius: inherit;
+  border-top-right-radius: inherit;
+  pointer-events: none;
+}
+
+.pure-glass-btn.is-sloshing {
+  animation: waterSloshAnimation 0.85s cubic-bezier(0.2, 1.35, 0.35, 1) forwards;
+}
+
+/* 100% Colorless Pure Water Dewdrop */
+.water-droplet-colorless {
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 25%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.25) 30%, rgba(255, 255, 255, 0.05) 65%, rgba(0, 0, 0, 0.05) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 
+    inset 1px 1px 2px rgba(255, 255, 255, 0.95),
+    inset -1px -1px 2px rgba(0, 0, 0, 0.08),
+    0 3px 8px rgba(0, 0, 0, 0.07);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  pointer-events: none;
+}
+
+@keyframes dropletWobble1 {
+  0%, 100% {
+    transform: translateY(0) scale(1) rotate(0deg);
+  }
+  33% {
+    transform: translateY(-12px) scale(1.06, 0.95) rotate(5deg);
+  }
+  66% {
+    transform: translateY(6px) scale(0.96, 1.04) rotate(-4deg);
+  }
+}
+
+@keyframes dropletWobble2 {
+  0%, 100% {
+    transform: translateY(0) scale(1) rotate(0deg);
+  }
+  40% {
+    transform: translateY(-16px) scale(0.95, 1.08) rotate(-6deg);
+  }
+  80% {
+    transform: translateY(8px) scale(1.05, 0.96) rotate(3deg);
+  }
+}
+
+/* ───────────── Panir Moto Tolke Utha Liquid Button ───────────── */
+.water-slosh-btn {
+  position: relative;
+  overflow: hidden;
+  color: #fff;
+  font-weight: 700;
+  background: linear-gradient(135deg, #00f5ff 0%, #0091ff 40%, #0047ff 75%, #7928ca 100%);
+  box-shadow: 
+    0 12px 35px rgba(0, 145, 255, 0.45),
+    0 4px 12px rgba(0, 245, 255, 0.35),
+    inset 0 2px 2px rgba(255, 255, 255, 0.75),
+    inset 0 -3px 8px rgba(0, 40, 150, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
+  user-select: none;
+}
+
+/* Dual rotating water wave disks creating organic fluid liquid agitation inside */
+.water-slosh-btn .water-wave-layer-1,
+.water-slosh-btn .water-wave-layer-2 {
+  content: "";
+  position: absolute;
+  width: 240px;
+  height: 240px;
+  border-radius: 42%;
+  pointer-events: none;
+}
+
+.water-slosh-btn .water-wave-layer-1 {
+  left: -40px;
+  bottom: -175px;
+  background: rgba(255, 255, 255, 0.28);
+  animation: waterWaveSpin 4.5s infinite linear;
+}
+
+.water-slosh-btn .water-wave-layer-2 {
+  right: -40px;
+  bottom: -170px;
+  background: rgba(0, 245, 255, 0.35);
+  animation: waterWaveSpin 6s infinite linear reverse;
+}
+
+@keyframes waterWaveSpin {
+  0% { transform: rotate(0deg); }
+  50% { transform: rotate(180deg) scale(1.05); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Specular glass reflection bar across the top of the button */
+.water-slosh-btn .water-reflection-shine {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 48%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0.05) 80%, transparent 100%);
+  border-top-left-radius: inherit;
+  border-top-right-radius: inherit;
+  pointer-events: none;
+}
+
+.water-slosh-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 16px 45px rgba(0, 145, 255, 0.6),
+    0 0 25px rgba(0, 245, 255, 0.65),
+    inset 0 2px 4px rgba(255, 255, 255, 0.9);
+}
+
+/* TOLKE UTHA (Liquid surge & slosh animation triggered on hit/click) */
+.water-slosh-btn.is-sloshing {
+  animation: waterSloshAnimation 0.85s cubic-bezier(0.2, 1.35, 0.35, 1) forwards;
+}
+
+@keyframes waterSloshAnimation {
+  0% {
+    transform: scale(1, 1);
+  }
+  15% {
+    /* Hard press / splash compression: squashes down and expands wide */
+    transform: scale(1.09, 0.82) translateY(4px);
+  }
+  35% {
+    /* Rebound surge: shoots upward and narrows like a liquid wave erupting */
+    transform: scale(0.92, 1.15) translateY(-7px);
+  }
+  55% {
+    /* Secondary splash bounce */
+    transform: scale(1.05, 0.94) translateY(2px);
+  }
+  75% {
+    /* Gentle wobble settling */
+    transform: scale(0.98, 1.03) translateY(-1px);
+  }
+  100% {
+    transform: scale(1, 1) translateY(0);
+  }
+}
+
+/* Expanding fluid ripple ring inside button */
+.liquid-ripple-effect {
+  position: absolute;
+  border-radius: 50%;
+  transform: scale(0);
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.95) 0%, rgba(0, 245, 255, 0.6) 40%, transparent 75%);
+  pointer-events: none;
+  animation: liquidRippleSurge 0.75s ease-out forwards;
+}
+
+@keyframes liquidRippleSurge {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0.95;
+  }
+  60% {
+    opacity: 0.7;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(4);
+    opacity: 0;
+  }
+}
+
+/* Card Edge Water Ripple on Droplet Collision */
+.card-contact-ripple {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  border: 1.5px solid rgba(0, 245, 255, 0.8);
+  box-shadow: 0 0 15px rgba(0, 245, 255, 0.6);
+  animation: cardRippleExpand 0.75s cubic-bezier(0.1, 0.85, 0.35, 1) forwards;
+}
+
+@keyframes cardRippleExpand {
+  0% {
+    transform: translate(-50%, -50%) scale(0.2);
+    opacity: 0.95;
+  }
+  60% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(3.5);
+    opacity: 0;
+  }
+}
+
+/* ───────────── Floating Logo Badge ───────────── */
+.liquid-logo {
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 700;
+  background: linear-gradient(135deg, #00eaff, #0066ff, #8a2be2);
+  box-shadow: 0 0 12px rgba(0, 234, 255, 0.4), 0 0 25px rgba(0, 102, 255, 0.3);
+  animation: logoFloat 5s infinite ease-in-out;
+}
+
+@keyframes logoFloat {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-2px);
+  }
+}
+
+/* ───────────── Glowing Floating Inputs ───────────── */
+.liquid-input {
+  width: 100%;
+  height: 52px;
+  padding: 0 18px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 14px;
+  outline: 0;
+  color: #fff;
+  font-size: 14px;
+  background: rgba(255, 255, 255, 0.06);
+  transition: all 0.35s ease;
+}
+
+.liquid-input:focus {
+  border-color: #00eaff;
+  box-shadow: 0 0 12px rgba(0, 234, 255, 0.4), inset 0 0 14px rgba(0, 234, 255, 0.08);
+}
+
+/* ───────────── Success Animations ───────────── */
+.success-screen {
+  min-height: 380px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  animation: screenAppear 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.success-icon {
+  width: 95px;
+  height: 95px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  background: rgba(0, 255, 170, 0.12);
+  border: 2px solid #00ffaa;
+  box-shadow: 0 0 20px #00ffaa, 0 0 60px rgba(0, 255, 170, 0.4);
+  animation: successPop 0.7s cubic-bezier(0.17, 0.67, 0.3, 1.4), successPulse 2s 1s infinite;
+}
+
+.check {
+  width: 30px;
+  height: 55px;
+  border-right: 5px solid #00ffaa;
+  border-bottom: 5px solid #00ffaa;
+  transform: rotate(45deg) scale(0);
+  animation: checkDraw 0.5s 0.35s forwards;
+  filter: drop-shadow(0 0 8px #00ffaa);
+}
+
+@keyframes successPop {
+  0% { transform: scale(0) rotate(-180deg); opacity: 0; }
+  70% { transform: scale(1.15) rotate(10deg); }
+  100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+
+@keyframes checkDraw {
+  to { transform: rotate(45deg) scale(1); }
+}
+
+@keyframes successPulse {
+  0%, 100% { box-shadow: 0 0 20px #00ffaa, 0 0 50px rgba(0, 255, 170, 0.4); }
+  50% { box-shadow: 0 0 35px #00ffaa, 0 0 85px rgba(0, 255, 170, 0.7); }
+}
+
+@keyframes screenAppear {
+  from { opacity: 0; transform: scale(0.7); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.loading-dots {
+  display: flex;
+  gap: 6px;
+  margin-top: 20px;
+}
+
+.loading-dots span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #00ffaa;
+  animation: dots 1s infinite ease-in-out;
+}
+
+.loading-dots span:nth-child(2) { animation-delay: 0.15s; }
+.loading-dots span:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes dots {
+  0%, 100% { transform: translateY(0); opacity: 0.4; }
+  50% { transform: translateY(-8px); opacity: 1; }
+}
+
+/* Custom sleek scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.3);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.5);
+}
+
+/* Markdown note preview */
+.md-preview { font-size: 0.875rem; line-height: 1.7; color: inherit; }
+.md-preview .md-h1 { font-size: 1.5rem; font-weight: 700; margin: 1.1rem 0 0.5rem; }
+.md-preview .md-h2 { font-size: 1.25rem; font-weight: 700; margin: 1rem 0 0.45rem; }
+.md-preview .md-h3 { font-size: 1.1rem; font-weight: 600; margin: 0.9rem 0 0.4rem; }
+.md-preview .md-h4 { font-size: 1rem; font-weight: 600; margin: 0.8rem 0 0.35rem; }
+.md-preview .md-p { margin: 0.4rem 0; }
+.md-preview .md-list { margin: 0.4rem 0 0.4rem 1.4rem; }
+.md-preview ul.md-list { list-style: disc; }
+.md-preview ol.md-list { list-style: decimal; }
+.md-preview .md-quote { border-left: 3px solid #00c6ff; padding: 0.15rem 0.85rem; margin: 0.5rem 0; color: #94a3b8; background: rgba(0, 198, 255, 0.06); border-radius: 0 0.4rem 0.4rem 0; }
+.md-preview .md-link { color: #00eaff; text-decoration: underline; }
+.md-preview .md-hr { border: 0; border-top: 1px solid rgba(148,163,184,0.25); margin: 1rem 0; }
+.md-preview .md-inline-code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.8em; padding: 0.1rem 0.35rem; border-radius: 0.3rem; background: rgba(148,163,184,0.18); }
+.md-preview .md-code-block { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.78rem; padding: 0.8rem 1rem; margin: 0.6rem 0; border-radius: 0.6rem; background: #080b18; color: #e2e8f0; overflow-x: auto; border: 1px solid rgba(255,255,255,0.08); }
+
+/* Rich text notes (WYSIWYG editor + read view) */
+.rich-content { font-size: 0.9rem; line-height: 1.7; word-break: break-word; }
+.rich-content h1 { font-size: 2rem; font-weight: 700; margin: 1.1rem 0 0.5rem; line-height: 1.25; }
+.rich-content h2 { font-size: 1.6rem; font-weight: 700; margin: 1rem 0 0.45rem; line-height: 1.3; }
+.rich-content h3 { font-size: 1.3rem; font-weight: 600; margin: 0.9rem 0 0.4rem; }
+.rich-content h4 { font-size: 1.1rem; font-weight: 600; margin: 0.8rem 0 0.35rem; }
+.rich-content h5 { font-size: 1rem; font-weight: 600; margin: 0.7rem 0 0.3rem; }
+.rich-content h6 { font-size: 0.85rem; font-weight: 600; margin: 0.7rem 0 0.3rem; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.8; }
+.rich-content p, .rich-content div { margin: 0.35rem 0; }
+.rich-content strong, .rich-content b { font-weight: 700; }
+.rich-content em, .rich-content i { font-style: italic; }
+.rich-content u { text-decoration: underline; }
+.rich-content s, .rich-content del, .rich-content strike { text-decoration: line-through; }
+.rich-content sub { vertical-align: sub; font-size: 0.75em; }
+.rich-content sup { vertical-align: super; font-size: 0.75em; }
+.rich-content ul { list-style: disc; margin: 0.4rem 0 0.4rem 1.5rem; padding-left: 0.5rem; }
+.rich-content ol { list-style: decimal; margin: 0.4rem 0 0.4rem 1.5rem; padding-left: 0.5rem; }
+.rich-content ul ul { list-style: circle; }
+.rich-content li { margin: 0.15rem 0; }
+.rich-content blockquote { border-left: 3px solid #00c6ff; padding: 0.3rem 0.9rem; margin: 0.6rem 0; color: #64748b; background: rgba(0,198,255,0.06); border-radius: 0 0.4rem 0.4rem 0; }
+.rich-content a { color: #0891b2; text-decoration: underline; cursor: pointer; }
+.dark .rich-content a { color: #00eaff; }
+.rich-content hr { border: 0; border-top: 1px solid rgba(148,163,184,0.35); margin: 1rem 0; }
+.rich-content code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.85em; padding: 0.1rem 0.35rem; border-radius: 0.3rem; background: rgba(148,163,184,0.2); }
+.rich-content pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.82rem; padding: 0.8rem 1rem; margin: 0.6rem 0; border-radius: 0.6rem; background: #080b18; color: #e2e8f0; overflow-x: auto; white-space: pre-wrap; border: 1px solid rgba(255,255,255,0.08); }
+.rich-content pre code { background: transparent; padding: 0; }
+.rich-content mark { background: #fde047; color: #111827; padding: 0 0.15rem; border-radius: 0.2rem; }
+.rich-editor:empty::before { content: attr(data-placeholder); color: #94a3b8; pointer-events: none; }
+
+/* Nested lists */
+.rich-content ul ul, .rich-content ol ul, .rich-content ul ol, .rich-content ol ol { margin: 0.15rem 0 0.15rem 1.25rem; }
+.rich-content ul { list-style-type: disc; }
+.rich-content ul ul { list-style-type: circle; }
+.rich-content ul ul ul { list-style-type: square; }
+.rich-content ol { list-style-type: decimal; }
+.rich-content ol ol { list-style-type: lower-alpha; }
+.rich-content ol ol ol { list-style-type: lower-roman; }
+.rich-content li[style*="list-style-type: none"] { margin: 0; }

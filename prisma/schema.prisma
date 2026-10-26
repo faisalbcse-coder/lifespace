@@ -1,0 +1,183 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-1.1.x", "debian-openssl-3.0.x", "rhel-openssl-1.0.x", "rhel-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String          @id @default(cuid())
+  email            String          @unique
+  name             String?
+  passwordHash     String
+  fatherName       String?
+  motherName       String?
+  phone            String?
+  address          String?
+  permanentAddress String?
+  dateOfBirth      String?
+  gender           String?
+  bloodGroup       String?
+  occupation       String?
+  bio              String?
+  emergencyContact String?
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  sections         Section[]
+  items            SectionItem[]
+  sessions         Session[]
+  preferences      UserPreference?
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([token])
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  email     String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([email])
+  @@index([token])
+}
+
+model UserPreference {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  theme           String   @default("system")
+  density         String   @default("compact")
+  showArchived    Boolean  @default(false)
+  seeMoreExpanded Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Section {
+  id         String        @id @default(cuid())
+  userId     String
+  user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name       String
+  orderIndex Int           @default(0)
+  color      String?       @default("indigo")
+  collapsed  Boolean       @default(false)
+  isArchived Boolean       @default(false)
+  isHidden   Boolean       @default(false)
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+  items      SectionItem[]
+
+  @@index([userId, isArchived, isHidden, orderIndex])
+  @@index([userId, name])
+}
+
+model SectionItem {
+  id          String    @id @default(cuid())
+  sectionId   String
+  section     Section   @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title       String
+  description String?
+  content     String?
+  progress    Int       @default(0)
+  scheduledDate DateTime?
+  startTime     String?
+  endTime       String?
+  rolloverCount Int     @default(0)
+  status      String    @default("TODO") // "TODO" | "IN_PROGRESS" | "DONE"
+  priority    String    @default("MEDIUM") // "LOW" | "MEDIUM" | "HIGH" | "URGENT"
+  itemType    String    @default("TASK") // "TASK" | "NOTE" | "PROJECT" | "HABIT" | "SKILL"
+  metadata    String?   // extensible JSON metadata
+  dueDate     DateTime?
+  startDate   DateTime?
+  endDate     DateTime?
+  completedAt DateTime?
+  isArchived  Boolean   @default(false)
+  orderIndex  Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Goal hierarchy relations
+  subGoalId   String?
+  subGoal     SubGoal?      @relation("SubGoalTasks", fields: [subGoalId], references: [id], onDelete: Cascade)
+  subGoals    SubGoal[]     @relation("GoalSubGoals")
+
+  subTasks    SubTask[]
+  attachments ItemAttachment[]
+  logs        ProgressLog[]
+
+  @@index([sectionId, isArchived, orderIndex])
+  @@index([userId, status])
+  @@index([userId, priority])
+  @@index([userId, dueDate])
+  @@index([userId, scheduledDate, status])
+  @@index([subGoalId])
+}
+
+model SubGoal {
+  id         String        @id @default(cuid())
+  goalId     String
+  goal       SectionItem   @relation("GoalSubGoals", fields: [goalId], references: [id], onDelete: Cascade)
+  title      String
+  startDate  DateTime?
+  endDate    DateTime?
+  orderIndex Int           @default(0)
+  collapsed  Boolean       @default(false)
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+  tasks      SectionItem[] @relation("SubGoalTasks")
+
+  @@index([goalId, orderIndex])
+}
+
+model SubTask {
+  id          String      @id @default(cuid())
+  itemId      String
+  item        SectionItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  title       String
+  isCompleted Boolean     @default(false)
+  orderIndex  Int         @default(0)
+  createdAt   DateTime    @default(now())
+
+  @@index([itemId, orderIndex])
+}
+
+model ItemAttachment {
+  id        String      @id @default(cuid())
+  itemId    String
+  item      SectionItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  type      String // "PDF" | "IMAGE" | "LINK" | "FILE"
+  title     String
+  url       String
+  mimeType  String?
+  fileSize  Int?
+  createdAt DateTime    @default(now())
+
+  @@index([itemId])
+}
+
+model ProgressLog {
+  id               String      @id @default(cuid())
+  itemId           String
+  item             SectionItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  note             String
+  progressSnapshot Int?
+  createdAt        DateTime    @default(now())
+
+  @@index([itemId, createdAt])
+}
