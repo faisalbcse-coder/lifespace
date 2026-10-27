@@ -23,9 +23,6 @@ export async function GET(req: NextRequest) {
     // Ensure user's workspace default sections are present
     await ensureWorkspaceInitialized(user.id);
 
-    // Carry unfinished tasks from previous days over to today
-    await rolloverOverdueDailyTasks(user.id);
-
     const sections = await db.section.findMany({
       where: {
         userId: user.id,

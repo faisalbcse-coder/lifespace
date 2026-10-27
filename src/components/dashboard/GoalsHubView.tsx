@@ -221,7 +221,7 @@ function SortableGoalSectionCard({
                 const targetCount = goal.subGoals?.length || 0;
                 const goalDates = getItemGoalDates(goal);
                 const dateRange = formatGoalRange(goalDates.startDate, goalDates.endDate);
-                const daysLeft = goalDates.endDate ? calculateDaysLeft(goalDates.endDate) : null;
+                const daysLeft = goalDates.endDate ? calculateDaysLeft(goalDates.endDate, goalDates.startDate) : null;
 
                 return (
                   <div
@@ -278,8 +278,8 @@ function SortableGoalSectionCard({
                                   daysLeft.isOverdue
                                     ? "bg-rose-50 dark:bg-rose-950/50 text-rose-700 dark:text-rose-400 border-rose-200/80 dark:border-rose-900/50"
                                     : daysLeft.isWarning
-                                    ? "bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400 border-amber-200/80 dark:border-amber-900/50"
-                                    : "bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border-emerald-200/70 dark:border-emerald-800/50"
+                                      ? "bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400 border-amber-200/80 dark:border-amber-900/50"
+                                      : "bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border-emerald-200/70 dark:border-emerald-800/50"
                                 )}
                                 title={`Due ${goalDates.endDate} (${daysLeft.label})`}
                               >

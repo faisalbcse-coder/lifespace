@@ -131,6 +131,9 @@ export const ScheduleItemSchema = z
   .object({
     scheduledDate: DateKeySchema.nullable().optional(),
     preset: z.enum(["tomorrow", "nextWeek", "today"]).optional(),
+    startTime: z.string().optional().nullable(),
+    endTime: z.string().optional().nullable(),
+    reason: z.string().max(2000).optional().nullable(),
   })
   .refine(
     (v) => v.scheduledDate !== undefined || v.preset !== undefined,

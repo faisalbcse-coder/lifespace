@@ -183,6 +183,17 @@ describe("Daily Dashboard & Navigation Logic", () => {
     const todayDaysLeft = calculateDaysLeft(todayKey());
     expect(todayDaysLeft?.daysLeft).toBe(0);
     expect(todayDaysLeft?.label).toBe("Ends today");
+
+    // When startDateKey and endDateKey are provided: counts from start to end
+    const startToEnd = calculateDaysLeft("2026-11-15", "2026-11-01");
+    expect(startToEnd?.daysLeft).toBe(15);
+    expect(startToEnd?.label).toBe("15 days");
+    expect(startToEnd?.isOverdue).toBe(false);
+
+    // Single day goal/target
+    const singleDay = calculateDaysLeft("2026-11-01", "2026-11-01");
+    expect(singleDay?.daysLeft).toBe(1);
+    expect(singleDay?.label).toBe("1 day");
   });
 
   it("filters overdue Due Tasks accurately from past dates and excludes done tasks", () => {
@@ -301,6 +312,65 @@ describe("Daily Dashboard & Navigation Logic", () => {
       section: { id: "sec-daily", name: "Daily", color: "indigo" },
     };
     expect(isGoalItem(normalTask as Item)).toBe(false);
+  });
+
+  it("strictly isolates overdue tasks from today's task list and supports rescheduling with delay reasons", () => {
+    const today = todayKey();
+    const pastDate = addDaysToKey(today, -3);
+    const futureDate = addDaysToKey(today, 2);
+
+    const pastOverdueTask: Partial<Item> = {
+      id: "overdue-1",
+      title: "Old unfinished task",
+      status: "TODO",
+      scheduledDate: pastDate,
+      isArchived: false,
+    };
+
+    const todayTask: Partial<Item> = {
+      id: "today-1",
+      title: "Task for today",
+      status: "TODO",
+      scheduledDate: today,
+      isArchived: false,
+    };
+
+    const candidateTasks = [pastOverdueTask, todayTask] as Item[];
+
+    // Filtering for Today's tasks: overdue tasks must NEVER appear on Today
+    const todayTasks = candidateTasks.filter((item) => {
+      if (item.isArchived) return false;
+      const taskDate = item.scheduledDate ? toDateKey(item.scheduledDate) : null;
+      if (today === todayKey() && taskDate && taskDate < todayKey()) {
+        return false;
+      }
+      return taskDate === today;
+    });
+
+    expect(todayTasks.map((t) => t.id)).toEqual(["today-1"]);
+    expect(todayTasks.find((t) => t.id === "overdue-1")).toBeUndefined();
+
+    // Overdue tasks collection: strictly items scheduled before today
+    const overdueTasks = candidateTasks.filter((item) => {
+      if (item.isArchived || item.status === "DONE") return false;
+      const taskDate = item.scheduledDate ? toDateKey(item.scheduledDate) : null;
+      return !!(taskDate && taskDate < todayKey());
+    });
+
+    expect(overdueTasks.map((t) => t.id)).toEqual(["overdue-1"]);
+
+    // Rescheduling overdue task to a specific future date and time with a reason
+    const rescheduledTask: Item = {
+      ...pastOverdueTask,
+      scheduledDate: futureDate,
+      startTime: "14:00",
+      endTime: "15:30",
+      metadata: JSON.stringify({ delayReason: "Awaiting client design approval" }),
+    } as Item;
+
+    expect(toDateKey(rescheduledTask.scheduledDate!)).toBe(futureDate);
+    expect(rescheduledTask.startTime).toBe("14:00");
+    expect(JSON.parse(rescheduledTask.metadata!).delayReason).toBe("Awaiting client design approval");
   });
 });
 

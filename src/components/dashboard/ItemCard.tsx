@@ -43,8 +43,11 @@ interface ItemCardProps {
   onToggleStatus: (item: Item) => void;
   onEdit: (item: Item) => void;
   onArchive: (item: Item) => void;
-  onDelete: (item: Item) => void;
-  onReschedule?: (item: Item, target: ReschedulePreset | { date: string }) => void;
+  onDelete?: (item: Item) => void;
+  onReschedule?: (
+    item: Item,
+    target: ReschedulePreset | { date: string; startTime?: string; endTime?: string; reason?: string }
+  ) => void;
 }
 
 export function ItemCard({
@@ -76,7 +79,7 @@ export function ItemCard({
   const goalProgress = isGoal ? calculateGoalProgress(item.subGoals) : null;
   const goalDates = isGoal ? getItemGoalDates(item) : null;
   const goalDateRange = goalDates ? formatGoalRange(goalDates.startDate, goalDates.endDate) : null;
-  const goalDaysLeft = goalDates?.endDate ? calculateDaysLeft(goalDates.endDate) : null;
+  const goalDaysLeft = goalDates?.endDate ? calculateDaysLeft(goalDates.endDate, goalDates.startDate) : null;
 
   const subTasks = item.subTasks ?? [];
   const subDone = subTasks.filter((s) => s.isCompleted).length;
@@ -322,7 +325,7 @@ export function ItemCard({
                       type="button"
                       onClick={() => {
                         setMenuOpen(false);
-                        onDelete(item);
+                        onDelete?.(item);
                       }}
                       className="w-full text-left px-3 py-1.5 flex items-center gap-2 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-rose-600 dark:text-rose-400 cursor-pointer"
                     >

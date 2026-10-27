@@ -143,22 +143,54 @@ export function calculateDurationDays(
 }
 
 /**
- * Calculates remaining days from today until an end date (e.g. for goals / targets).
+ * Calculates days for a goal or target timeline.
+ * If both startDateKey and endDateKey are provided, counts from Start Date to End Date.
+ * If only endDateKey is provided, calculates remaining days from today until the end date.
  */
-export function calculateDaysLeft(endDateKey: string | null | undefined): {
+export function calculateDaysLeft(
+  endDateKey: string | null | undefined,
+  startDateKey?: string | null | undefined
+): {
   daysLeft: number;
   label: string;
   isOverdue: boolean;
   isWarning: boolean;
 } | null {
   if (!endDateKey) return null;
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
 
   const end = new Date(`${endDateKey}T00:00:00`);
   if (isNaN(end.getTime())) return null;
 
   const msPerDay = 1000 * 60 * 60 * 24;
+
+  // When start date is provided, count duration from Start to End
+  if (startDateKey) {
+    const start = new Date(`${startDateKey}T00:00:00`);
+    if (!isNaN(start.getTime())) {
+      if (end.getTime() < start.getTime()) {
+        const diff = Math.round((start.getTime() - end.getTime()) / msPerDay);
+        return {
+          daysLeft: -diff,
+          label: diff === 1 ? "1 day overdue" : `${diff} days overdue`,
+          isOverdue: true,
+          isWarning: true,
+        };
+      }
+
+      const diffDays = Math.max(1, Math.round((end.getTime() - start.getTime()) / msPerDay) + 1);
+      return {
+        daysLeft: diffDays,
+        label: diffDays === 1 ? "1 day" : `${diffDays} days`,
+        isOverdue: false,
+        isWarning: false,
+      };
+    }
+  }
+
+  // Fallback: count from today to end date
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
   const diffDays = Math.round((end.getTime() - today.getTime()) / msPerDay);
 
   if (diffDays < 0) {

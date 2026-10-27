@@ -363,10 +363,17 @@ export default function DashboardPage() {
 
   const handleRescheduleItem = async (
     item: Item,
-    target: ReschedulePreset | { date: string }
+    target: ReschedulePreset | { date: string; startTime?: string; endTime?: string; reason?: string }
   ) => {
     const body =
-      typeof target === "string" ? { preset: target } : { scheduledDate: target.date };
+      typeof target === "string"
+        ? { preset: target }
+        : {
+            scheduledDate: target.date,
+            startTime: target.startTime,
+            endTime: target.endTime,
+            reason: target.reason,
+          };
     try {
       const res = await fetch(`/api/items/${item.id}/schedule`, {
         method: "PATCH",
@@ -391,7 +398,7 @@ export default function DashboardPage() {
             : target === "tomorrow"
             ? "Moved to tomorrow"
             : "Moved to next week"
-          : `Scheduled for ${addDaysToKey(target.date, 0)}`
+          : `Rescheduled for ${target.date}${target.startTime ? ` at ${target.startTime}` : ""}`
       );
     } catch (err) {
       error(err instanceof Error ? err.message : "Failed to reschedule item");

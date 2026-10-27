@@ -39,9 +39,54 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
       key = parsed.data.scheduledDate ?? null;
     }
 
+    const existingItem = await db.sectionItem.findUnique({
+      where: { id },
+      select: { scheduledDate: true, metadata: true },
+    });
+
+    const dataToUpdate: Record<string, unknown> = {
+      scheduledDate: key ? parseDateKey(key) : null,
+      rolloverCount: 0,
+    };
+
+    if (parsed.data.startTime !== undefined) {
+      dataToUpdate.startTime = parsed.data.startTime;
+    }
+    if (parsed.data.endTime !== undefined) {
+      dataToUpdate.endTime = parsed.data.endTime;
+    }
+
+    if (parsed.data.reason) {
+      let metaObj: Record<string, unknown> = {};
+      try {
+        if (existingItem?.metadata) metaObj = JSON.parse(existingItem.metadata);
+      } catch {
+        // ignore
+      }
+      metaObj.delayReason = parsed.data.reason;
+      metaObj.lastRescheduledAt = new Date().toISOString();
+      if (!Array.isArray(metaObj.rescheduleHistory)) {
+        metaObj.rescheduleHistory = [];
+      }
+      (metaObj.rescheduleHistory as Array<{ from: string | null; to: string | null; reason: string; timestamp: string }>).push({
+        from: existingItem?.scheduledDate ? existingItem.scheduledDate.toISOString().slice(0, 10) : null,
+        to: key,
+        reason: parsed.data.reason,
+        timestamp: new Date().toISOString(),
+      });
+      dataToUpdate.metadata = JSON.stringify(metaObj);
+
+      await db.progressLog.create({
+        data: {
+          itemId: id,
+          note: `Rescheduled to ${key || "unscheduled"}. Reason: ${parsed.data.reason}`,
+        },
+      });
+    }
+
     const item = await db.sectionItem.update({
       where: { id },
-      data: { scheduledDate: key ? parseDateKey(key) : null, rolloverCount: 0 },
+      data: dataToUpdate,
       include: {
         section: { select: { id: true, name: true, color: true } },
         subTasks: { select: { id: true, isCompleted: true } },
